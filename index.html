@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Budget Hub"/>
-<meta name="theme-color" content="#343A40"/>
+<meta name="theme-color" content="#1C1C1C"/>
 <link rel="manifest" id="pwa-manifest"/>
 <script>
 // Generate PNG icon using canvas — required for iOS home screen & Android PWA
@@ -23,12 +23,12 @@ function makeIconPNG(size){
   ctx.lineTo(size,size-r);ctx.quadraticCurveTo(size,size,size-r,size);
   ctx.lineTo(r,size);ctx.quadraticCurveTo(0,size,0,size-r);
   ctx.lineTo(0,r);ctx.quadraticCurveTo(0,0,r,0);ctx.closePath();
-  ctx.fillStyle='#343A40';ctx.fill();
+  ctx.fillStyle='#1C1C1C';ctx.fill();
   // "B" letter — bold, white, centred
   ctx.fillStyle='#ffffff';
   ctx.font='bold '+Math.round(size*0.58)+'px -apple-system,BlinkMacSystemFont,Arial,sans-serif';
   ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText('B',size/2,size*0.52);
+  ctx.fillText('BH',size/2,size*0.52);
   // Small "₨" rupee below
   // ctx.font='bold '+Math.round(size*0.18)+'px -apple-system,BlinkMacSystemFont,Arial,sans-serif';
   // ctx.fillStyle='rgba(255,255,255,0.75)';
