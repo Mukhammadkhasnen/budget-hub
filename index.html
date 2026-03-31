@@ -1,6 +1,8 @@
-<html lang="en"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Budget Hub</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
@@ -125,21 +127,21 @@ tr:hover td{background:var(--surface2)}
 <div class="ov" id="ov"><div class="ovc"><div class="sp"></div><div id="ov-msg" style="font-size:14px;color:var(--text2)">Loading…</div></div></div>
 
 <!-- ===== LOGIN ===== -->
-<div id="s-login" class="screen">
+<div id="s-login" class="screen active">
   <div class="auth-page">
     <div class="auth-logo">
       <h1>Budget Hub</h1>
       <p>Hostel finance tracker · Any device · Free</p>
     </div>
-    <div id="no-url-warn" style="display: block; background: var(--amber-l); border: .5px solid var(--amber); border-radius: var(--rs); padding: 12px 16px; font-size: 13px; color: var(--amber); max-width: 340px; width: 100%; line-height: 1.6;">
+    <div id="no-url-warn" style="display:none;background:var(--amber-l);border:.5px solid var(--amber);border-radius:var(--rs);padding:12px 16px;font-size:13px;color:var(--amber);max-width:340px;width:100%;line-height:1.6">
       <strong style="display:block;margin-bottom:3px">Google Sheets not set up yet</strong>
       Click "Setup Guide" below. Takes 5 minutes. Until then use Offline mode (data stays on this device only).
     </div>
     <div class="auth-card">
-      <div class="fg"><label>Username</label><input type="text" id="l-user" placeholder="Your username" autocomplete="username"></div>
+      <div class="fg"><label>Username</label><input type="text" id="l-user" placeholder="Your username" autocomplete="username"/></div>
       <div class="fg">
         <label>PIN</label>
-        <input type="password" id="l-pin" placeholder="Your PIN" inputmode="numeric" autocomplete="current-password">
+        <input type="password" id="l-pin" placeholder="Your PIN" inputmode="numeric" autocomplete="current-password"/>
         <div class="err" id="l-err"></div>
       </div>
       <button class="btn btn-p btn-w" id="l-btn" onclick="doLogin()">Sign in</button>
@@ -152,7 +154,7 @@ tr:hover td{background:var(--surface2)}
 </div>
 
 <!-- ===== SETUP GUIDE ===== -->
-<div id="s-setup" class="screen active">
+<div id="s-setup" class="screen">
   <div class="shell" style="padding-top:1.5rem">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
       <button class="btn btn-sm" onclick="show('s-login')">← Back</button>
@@ -190,7 +192,7 @@ tr:hover td{background:var(--surface2)}
           <h4>Create the Apps Script (connects app ↔ Sheet)</h4>
           <p>In your Google Sheet, click <strong>Extensions → Apps Script</strong>. A new tab opens.</p>
           <p>Delete everything in the editor and paste this entire script:</p>
-          <textarea id="script-box" readonly="" onclick="this.select()"></textarea>
+          <textarea id="script-box" readonly onclick="this.select()"></textarea>
           <p style="margin-top:8px">Click the <strong>Save</strong> icon (💾), then click <strong>Deploy → New deployment</strong>.</p>
           <p>In the dialog: Type = <strong>Web app</strong> · Execute as = <strong>Me</strong> · Who has access = <strong>Anyone</strong> · Click <strong>Deploy</strong>.</p>
           <p>Google will ask you to authorize — click through. Then copy the <strong>Web app URL</strong> that appears.</p>
@@ -201,13 +203,13 @@ tr:hover td{background:var(--surface2)}
         <div class="sn">4</div>
         <div class="sb">
           <h4>Paste your Web App URL here</h4>
-          <p>Paste the URL you copied from step 3 below, then click Save &amp; Test:</p>
+          <p>Paste the URL you copied from step 3 below, then click Save & Test:</p>
           <div style="display:flex;gap:8px;margin-top:8px">
-            <input type="url" id="url-input" placeholder="https://script.google.com/macros/s/..." style="flex:1">
+            <input type="url" id="url-input" placeholder="https://script.google.com/macros/s/..." style="flex:1"/>
             <button class="btn btn-p btn-sm" onclick="saveUrl()">Save &amp; Test</button>
           </div>
           <div class="err" id="url-err" style="margin-top:6px"></div>
-          <div id="url-ok" style="display: block; color: var(--green); font-size: 12px; margin-top: 6px;">✓ Connected! You can now sign in.</div>
+          <div id="url-ok" style="display:none;color:var(--green);font-size:12px;margin-top:6px">✓ Connected! You can now sign in.</div>
         </div>
       </div>
 
@@ -267,17 +269,24 @@ tr:hover td{background:var(--surface2)}
     <div id="tp-add" class="tp">
       <div class="card">
         <div class="ct">My monthly settings</div>
+        <div style="background:var(--blue-l);border:.5px solid var(--blue);border-radius:var(--rs);padding:10px 14px;font-size:13px;color:var(--blue-d);margin-bottom:1rem;line-height:1.6">
+          <strong>New month?</strong> Update your salary and enter whatever you currently have left from last month as carry-over. The app adds both to calculate your real spendable balance.
+        </div>
         <div class="r2">
-          <div class="fg"><label>Monthly salary (PKR)</label><input type="number" id="s-sal" inputmode="numeric"></div>
-          <div class="fg"><label>Payday (day of month)</label><input type="number" id="s-pay" min="1" max="31" inputmode="numeric"></div>
+          <div class="fg"><label>This month's salary (PKR)</label><input type="number" id="s-sal" inputmode="numeric" placeholder="e.g. 162000"/></div>
+          <div class="fg"><label>Carry-over from last month (PKR)</label><input type="number" id="s-carry" inputmode="numeric" placeholder="0 if nothing left"/></div>
+        </div>
+        <div class="r2" style="margin-top:4px">
+          <div class="fg"><label>Payday (day of month)</label><input type="number" id="s-pay" min="1" max="31" inputmode="numeric"/></div>
+          <div class="fg"><label>Hostel rent</label><input type="number" id="s-ren" inputmode="numeric"/></div>
         </div>
         <div class="r3" style="margin-top:4px">
-          <div class="fg"><label>Hostel rent</label><input type="number" id="s-ren" inputmode="numeric"></div>
-          <div class="fg"><label>Tuition</label><input type="number" id="s-tui" inputmode="numeric"></div>
-          <div class="fg"><label>Gym / trainer</label><input type="number" id="s-gym" inputmode="numeric"></div>
+          <div class="fg"><label>Tuition</label><input type="number" id="s-tui" inputmode="numeric"/></div>
+          <div class="fg"><label>Gym / trainer</label><input type="number" id="s-gym" inputmode="numeric"/></div>
+          <div class="fg"><label>SIM bill</label><input type="number" id="s-sim" inputmode="numeric" placeholder="e.g. 500"/></div>
         </div>
         <div style="max-width:280px">
-          <div class="fg"><label>Emergency fund (save aside)</label><input type="number" id="s-efu" inputmode="numeric"></div>
+          <div class="fg"><label>Emergency fund (save aside)</label><input type="number" id="s-efu" inputmode="numeric"/></div>
         </div>
         <button class="btn btn-p" onclick="saveSettings()">Save settings</button>
       </div>
@@ -285,10 +294,10 @@ tr:hover td{background:var(--surface2)}
         <div class="card" style="margin:0">
           <div class="ct" style="color:var(--red)">Money out</div>
           <div class="fg"><label>Category</label>
-            <select id="o-cat"><option>Food</option><option>Travel</option><option>Utilities / Grooming</option><option>Shopping</option><option>Lent money</option><option>Repaid debt</option><option>Misc</option></select>
+            <select id="o-cat"><option>Food</option><option>Travel</option><option>Electricity Bill</option><option>Gas Bill</option><option>Internet Bill</option><option>Water Bill</option><option>Phone Bill</option><option>Grooming / Soap</option><option>Shopping</option><option>Subscriptions</option><option>Lent money</option><option>Repaid debt</option><option>Misc</option></select>
           </div>
-          <div class="fg"><label>Amount (PKR)</label><input type="number" id="o-amt" min="0" step="50" inputmode="numeric"></div>
-          <div class="fg"><label>Note</label><input type="text" id="o-note" placeholder="e.g. Lunch with Sanan"></div>
+          <div class="fg"><label>Amount (PKR)</label><input type="number" id="o-amt" min="0" step="50" inputmode="numeric"/></div>
+          <div class="fg"><label>Note</label><input type="text" id="o-note" placeholder="e.g. Lunch with Sanan"/></div>
           <button class="btn btn-d btn-w" onclick="addEntry('out')">Log outflow</button>
         </div>
         <div class="card" style="margin:0">
@@ -296,8 +305,8 @@ tr:hover td{background:var(--surface2)}
           <div class="fg"><label>Source</label>
             <select id="i-cat"><option>Extra work</option><option>Gift</option><option>Borrowed money</option><option>Returned loan</option><option>Other</option></select>
           </div>
-          <div class="fg"><label>Amount (PKR)</label><input type="number" id="i-amt" min="0" step="50" inputmode="numeric"></div>
-          <div class="fg"><label>Note</label><input type="text" id="i-note" placeholder="e.g. Borrowed from Ahmed"></div>
+          <div class="fg"><label>Amount (PKR)</label><input type="number" id="i-amt" min="0" step="50" inputmode="numeric"/></div>
+          <div class="fg"><label>Note</label><input type="text" id="i-note" placeholder="e.g. Borrowed from Ahmed"/></div>
           <button class="btn btn-p btn-w" onclick="addEntry('in')">Log inflow</button>
         </div>
       </div>
@@ -327,8 +336,8 @@ tr:hover td{background:var(--surface2)}
       <div class="card">
         <div class="ct">Add new user</div>
         <div class="r2">
-          <div class="fg"><label>Username</label><input type="text" id="nu-name"></div>
-          <div class="fg"><label>PIN</label><input type="password" id="nu-pin"></div>
+          <div class="fg"><label>Username</label><input type="text" id="nu-name"/></div>
+          <div class="fg"><label>PIN</label><input type="password" id="nu-pin"/></div>
         </div>
         <div class="fg" style="max-width:180px"><label>Role</label>
           <select id="nu-role"><option value="user">User</option><option value="admin">Admin</option></select>
@@ -340,7 +349,7 @@ tr:hover td{background:var(--surface2)}
       <div class="card"><div class="ct">All transactions</div><div class="tw" id="a-tx"></div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">
         <button class="btn btn-sm" onclick="dlBackup()">⬇ Export backup</button>
-        <label class="btn btn-sm" style="cursor:pointer">⬆ Import backup<input type="file" accept=".json" style="display:none" onchange="importBackup(event)"></label>
+        <label class="btn btn-sm" style="cursor:pointer">⬆ Import backup<input type="file" accept=".json" style="display:none" onchange="importBackup(event)"/></label>
         <button class="btn btn-sm" onclick="goSetup()">⚙️ Setup Guide</button>
         <button class="btn btn-sm" onclick="changeUrl()">🔗 Change Sheet URL</button>
       </div>
@@ -472,7 +481,7 @@ function loadLocal(){
   }catch(e){}
   DB={
     users:{
-      "Khasnen":{pin:"Khasnen123",role:"admin",settings:{salary:162000,payday:10,rent:18000,tuition:0,gym:0,efund:5000}},
+      "Khasnen":{pin:"Khasnen123",role:"admin",settings:{salary:162000,carryover:0,payday:10,rent:18000,tuition:0,gym:0,sim:0,efund:5000}},
       "Sanan":  {pin:"sanan123",  role:"user", settings:{salary:162000,payday:10,rent:18000,tuition:0,gym:0,efund:5000}},
       "Sahad":  {pin:"sahad456",  role:"user", settings:{salary:162000,payday:10,rent:18000,tuition:0,gym:0,efund:5000}}
     },
@@ -530,14 +539,16 @@ function tab(n){
 function loadSettForm(){
   const s=DB.users[CU]?.settings||{};
   document.getElementById('s-sal').value=s.salary||0;
+  document.getElementById('s-carry').value=s.carryover||0;
   document.getElementById('s-pay').value=s.payday||10;
   document.getElementById('s-ren').value=s.rent||0;
   document.getElementById('s-tui').value=s.tuition||0;
   document.getElementById('s-gym').value=s.gym||0;
+  document.getElementById('s-sim').value=s.sim||0;
   document.getElementById('s-efu').value=s.efund||0;
 }
 async function saveSettings(){
-  const s={salary:+document.getElementById('s-sal').value,payday:+document.getElementById('s-pay').value,rent:+document.getElementById('s-ren').value,tuition:+document.getElementById('s-tui').value,gym:+document.getElementById('s-gym').value,efund:+document.getElementById('s-efu').value};
+  const s={salary:+document.getElementById('s-sal').value,carryover:+document.getElementById('s-carry').value,payday:+document.getElementById('s-pay').value,rent:+document.getElementById('s-ren').value,tuition:+document.getElementById('s-tui').value,gym:+document.getElementById('s-gym').value,sim:+document.getElementById('s-sim').value,efund:+document.getElementById('s-efu').value};
   DB.users[CU].settings=s; saveLocal(); sync('s');
   const res=await apiCall('saveUser',{username:CU,pin:DB.users[CU].pin,role:DB.users[CU].role,settings:s});
   sync(res?'ok':'e',res?'Saved':'Saved offline');
@@ -575,40 +586,85 @@ function rDash(){
   const s=gs(),ents=ge();
   const exp=ents.filter(e=>e.type==='expense');
   const inc=ents.filter(e=>e.type==='income');
-  const eIn=inc.filter(e=>e.category!=='Borrowed money').reduce((a,e)=>a+e.amount,0);
-  const spent=exp.filter(e=>e.category!=='Repaid debt').reduce((a,e)=>a+e.amount,0);
-  const fixed=(s.rent||0)+(s.tuition||0)+(s.gym||0)+(s.efund||0);
-  const bal=(s.salary||0)+eIn-fixed-spent;
+  const eIn=inc.reduce((a,e)=>a+e.amount,0);
+  const spent=exp.reduce((a,e)=>a+e.amount,0);
+  const fixed=(s.rent||0)+(s.tuition||0)+(s.gym||0)+(s.sim||0)+(s.efund||0);
+
+  // Balance logic:
+  // borrowed money = real cash added to balance (logged as income) — fully spendable
+  // repaid debt    = real cash leaving (logged as expense) — deducted when you actually pay
+  // lent money     = real cash leaving (logged as expense) — already deducted
+  // returned loan  = real cash back (logged as income) — added when received
+  // Debt reminders are warnings only, never affect the balance calculation
+  const borTotal=inc.filter(e=>e.category==='Borrowed money').reduce((a,e)=>a+e.amount,0);
+  const repTotal=exp.filter(e=>e.category==='Repaid debt').reduce((a,e)=>a+e.amount,0);
+  const lntTotal=exp.filter(e=>e.category==='Lent money').reduce((a,e)=>a+e.amount,0);
+  const retTotal=inc.filter(e=>e.category==='Returned loan').reduce((a,e)=>a+e.amount,0);
+  const stillOwe=Math.max(0,borTotal-repTotal);
+  const stillOwed=Math.max(0,lntTotal-retTotal);
+
+  // Balance = salary + carryover + ALL income (including borrowed) - fixed - ALL expenses (including repayments)
+  const bal=(s.salary||0)+(s.carryover||0)+eIn-fixed-spent;
   const dl=daysLeft(), daily=Math.round(bal/dl);
 
+  const lentEntries=exp.filter(e=>e.category==='Lent money');
+  const retEntries=inc.filter(e=>e.category==='Returned loan');
+
+  const carryTile=s.carryover>0?`<div class="met"><div class="ml">Carry-over</div><div class="mv pos">+PKR ${(s.carryover||0).toLocaleString()}</div></div>`:'';
+  const borTile=borTotal>0?`<div class="met"><div class="ml">Borrowed (spendable)</div><div class="mv pos">+PKR ${borTotal.toLocaleString()}</div></div>`:'';
+  const owedTile=stillOwed>0?`<div class="met"><div class="ml">To collect</div><div class="mv warn">PKR ${stillOwed.toLocaleString()}</div></div>`:'';
   document.getElementById('d-mets').innerHTML=`
-    <div class="met"><div class="ml">Balance</div><div class="mv ${bal>=0?'pos':'neg'}">PKR ${bal.toLocaleString()}</div></div>
+    <div class="met"><div class="ml">Spendable balance</div><div class="mv ${bal>=0?'pos':'neg'}">PKR ${bal.toLocaleString()}</div></div>
     <div class="met"><div class="ml">Daily safe spend</div><div class="mv ${daily>=0?'pos':'neg'}">PKR ${daily.toLocaleString()}</div></div>
     <div class="met"><div class="ml">Days to payday</div><div class="mv">${dl}</div></div>
-    <div class="met"><div class="ml">Total spent</div><div class="mv warn">PKR ${spent.toLocaleString()}</div></div>`;
+    <div class="met"><div class="ml">Total spent</div><div class="mv warn">PKR ${spent.toLocaleString()}</div></div>${carryTile}${borTile}${owedTile}`;
 
-  const bor=inc.filter(e=>e.category==='Borrowed money').reduce((a,e)=>a+e.amount,0);
-  const rep=exp.filter(e=>e.category==='Repaid debt').reduce((a,e)=>a+e.amount,0);
-  const lnt=exp.filter(e=>e.category==='Lent money').reduce((a,e)=>a+e.amount,0);
-  const ret=inc.filter(e=>e.category==='Returned loan').reduce((a,e)=>a+e.amount,0);
   const al=document.getElementById('d-alerts'); al.innerHTML='';
-  if(bor-rep>0) al.innerHTML+=`<div class="al al-w">You owe: PKR ${(bor-rep).toLocaleString()}</div>`;
-  if(lnt-ret>0) al.innerHTML+=`<div class="al al-i">People owe you: PKR ${(lnt-ret).toLocaleString()}</div>`;
-  if(bal<0)     al.innerHTML+=`<div class="al al-w">Balance is negative — check your spending</div>`;
-  if(daily<500&&daily>=0) al.innerHTML+=`<div class="al al-w">Daily budget is tight: PKR ${daily}/day</div>`;
+
+  // Reminder: money you still owe — NOT deducted yet, will reduce balance when you log repayment
+  if(stillOwe>0){
+    const borEntries=inc.filter(e=>e.category==='Borrowed money');
+    const breakdown=borEntries.map(e=>{
+      const paid=exp.filter(x=>x.category==='Repaid debt'&&(x.note||'').toLowerCase().includes((e.note||'').toLowerCase())).reduce((a,x)=>a+x.amount,0);
+      const left=e.amount-paid;
+      return left>0&&e.note?`${e.note} (PKR ${left.toLocaleString()} left)`:left>0?`PKR ${left.toLocaleString()} unpaid`:null;
+    }).filter(Boolean);
+    const detail=breakdown.length?` — ${breakdown.slice(0,3).join(', ')}`:''
+    al.innerHTML+=`<div class="al al-w">⚠️ Reminder: you owe PKR ${stillOwe.toLocaleString()}${detail}. Log "Repaid debt" when you pay — it will deduct from balance then.</div>`;
+  }
+
+  // Reminder: money others owe you — not yet in balance, will add when you log "Returned loan"
+  if(stillOwed>0){
+    const pending=lentEntries.map(e=>{
+      const got=retEntries.filter(r=>(r.note||'').toLowerCase().includes((e.note||'').toLowerCase())).reduce((a,r)=>a+r.amount,0);
+      const left=e.amount-got;
+      return left>0&&e.note?`${e.note} owes PKR ${left.toLocaleString()}`:left>0?`PKR ${left.toLocaleString()} pending`:null;
+    }).filter(Boolean);
+    const detail=pending.length?` — ${pending.slice(0,3).join(', ')}`:''
+    al.innerHTML+=`<div class="al al-i">💰 People owe you PKR ${stillOwed.toLocaleString()}${detail}. Log "Returned loan" when received — it will add to balance then.</div>`;
+  }
+
+  if(s.carryover>0) al.innerHTML+=`<div class="al al-i">✓ PKR ${s.carryover.toLocaleString()} carry-over from last month included.</div>`;
+  if(bal<0)         al.innerHTML+=`<div class="al al-w">🚨 Balance is negative — check your spending</div>`;
+  else if(daily<500) al.innerHTML+=`<div class="al al-w">Daily budget is tight: PKR ${daily}/day</div>`;
+
 
   // Pie
   const ct={};
-  exp.filter(e=>e.category!=='Repaid debt').forEach(e=>{ct[e.category]=(ct[e.category]||0)+e.amount;});
+  exp.filter(e=>!['Repaid debt','Lent money'].includes(e.category)).forEach(e=>{ct[e.category]=(ct[e.category]||0)+e.amount;});
   const ck=Object.keys(ct), cc=['#378ADD','#1D9E75','#BA7517','#D85A30','#7F77DD','#D4537E','#888780'];
-  if(PIE) PIE.destroy();
+  if(PIE){PIE.destroy();PIE=null;}
+  const pieWrap=document.getElementById('c-pie').parentNode;
+  pieWrap.innerHTML='<canvas id="c-pie"></canvas>';
   const pc=document.getElementById('c-pie').getContext('2d');
   if(ck.length>0) PIE=new Chart(pc,{type:'doughnut',data:{labels:ck,datasets:[{data:ck.map(k=>ct[k]),backgroundColor:cc.slice(0,ck.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:8,padding:6}}}}});
 
-  // Bar
+  // Bar — replace canvas entirely to avoid stale context on re-login
   const d7=[];
   for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);d7.push(d.toISOString().split('T')[0]);}
-  if(BAR) BAR.destroy();
+  if(BAR){BAR.destroy();BAR=null;}
+  const barWrap=document.getElementById('c-bar').parentNode;
+  barWrap.innerHTML='<canvas id="c-bar"></canvas>';
   const bc=document.getElementById('c-bar').getContext('2d');
   BAR=new Chart(bc,{type:'bar',data:{labels:d7.map(d=>d.slice(5)),datasets:[{data:d7.map(d=>exp.filter(e=>e.date===d).reduce((a,e)=>a+e.amount,0)),backgroundColor:'#378ADD',borderRadius:3,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>'PKR '+(v>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(128,128,128,0.1)'}}}}});
 
@@ -644,18 +700,56 @@ function rDebts(){
   const sm=(t,c)=>ents.filter(e=>e.type===t&&e.category===c).reduce((a,e)=>a+e.amount,0);
   const bor=sm('income','Borrowed money'),rep=sm('expense','Repaid debt');
   const lnt=sm('expense','Lent money'),ret=sm('income','Returned loan');
+  const stillOwe=Math.max(0,bor-rep);
+  const stillOwed=Math.max(0,lnt-ret);
+
+  // Build per-person breakdown for money you lent
+  const lentEntries=ents.filter(e=>e.category==='Lent money');
+  const retEntries=ents.filter(e=>e.category==='Returned loan');
+  const lentRows=lentEntries.map(e=>{
+    const got=retEntries.filter(r=>(r.note||'').toLowerCase().includes((e.note||'').toLowerCase())).reduce((a,r)=>a+r.amount,0);
+    const left=e.amount-got;
+    const status=left<=0
+      ? `<span class="badge bi">Returned ✓</span>`
+      : `<span class="badge" style="background:var(--amber-l);color:var(--amber)">PKR ${left.toLocaleString()} pending</span>`;
+    return `<tr><td>${e.date}</td><td>${e.note||'—'}</td><td>PKR ${e.amount.toLocaleString()}</td><td>PKR ${got.toLocaleString()}</td><td>${status}</td></tr>`;
+  }).join('');
+
+  // Build per-person breakdown for money you borrowed
+  const borEntries=ents.filter(e=>e.category==='Borrowed money');
+  const repEntries=ents.filter(e=>e.category==='Repaid debt');
+  const borRows=borEntries.map(e=>{
+    const paid=repEntries.filter(r=>(r.note||'').toLowerCase().includes((e.note||'').toLowerCase())).reduce((a,r)=>a+r.amount,0);
+    const left=e.amount-paid;
+    const status=left<=0
+      ? `<span class="badge bi">Repaid ✓</span>`
+      : `<span class="badge bo">PKR ${left.toLocaleString()} still owed</span>`;
+    return `<tr><td>${e.date}</td><td>${e.note||'—'}</td><td>PKR ${e.amount.toLocaleString()}</td><td>PKR ${paid.toLocaleString()}</td><td>${status}</td></tr>`;
+  }).join('');
+
   document.getElementById('debt-div').innerHTML=`
     <div class="mets" style="margin-bottom:1.25rem">
       <div class="met"><div class="ml">You borrowed</div><div class="mv neg">PKR ${bor.toLocaleString()}</div></div>
       <div class="met"><div class="ml">You repaid</div><div class="mv pos">PKR ${rep.toLocaleString()}</div></div>
-      <div class="met"><div class="ml">Still owe</div><div class="mv ${(bor-rep)>0?'neg':'pos'}">PKR ${(bor-rep).toLocaleString()}</div></div>
+      <div class="met"><div class="ml">Still owe</div><div class="mv ${stillOwe>0?'neg':'pos'}">PKR ${stillOwe.toLocaleString()}</div></div>
     </div>
     <div class="mets" style="margin-bottom:1.25rem">
       <div class="met"><div class="ml">You lent</div><div class="mv warn">PKR ${lnt.toLocaleString()}</div></div>
       <div class="met"><div class="ml">Returned to you</div><div class="mv pos">PKR ${ret.toLocaleString()}</div></div>
-      <div class="met"><div class="ml">Still to receive</div><div class="mv ${(lnt-ret)>0?'warn':'pos'}">PKR ${(lnt-ret).toLocaleString()}</div></div>
+      <div class="met"><div class="ml">Still to collect</div><div class="mv ${stillOwed>0?'warn':'pos'}">PKR ${stillOwed.toLocaleString()}</div></div>
     </div>
-    <div class="card"><div class="ct">Debt entries</div><div class="tw">${tbl(ents.filter(e=>['Borrowed money','Repaid debt','Lent money','Returned loan'].includes(e.category)))}</div></div>`;
+    ${stillOwe>0?`<div class="al al-w" style="margin-bottom:1rem">⚠️ You still owe PKR ${stillOwe.toLocaleString()} total. Log "Repaid debt" with the person's name in the note when you pay back.</div>`:''}
+    ${stillOwed>0?`<div class="al al-i" style="margin-bottom:1rem">💰 You are owed PKR ${stillOwed.toLocaleString()} total. Log "Returned loan" with the person's name when you receive it.</div>`:''}
+    ${borRows?`<div class="card" style="margin-bottom:1rem">
+      <div class="ct">Money you borrowed — repayment tracker</div>
+      <div class="tw"><table><thead><tr><th>Date</th><th>From / Note</th><th>Borrowed</th><th>Repaid</th><th>Status</th></tr></thead><tbody>${borRows}</tbody></table></div>
+    </div>`:''}
+    ${lentRows?`<div class="card">
+      <div class="ct">Money you lent — collection tracker</div>
+      <div class="tw"><table><thead><tr><th>Date</th><th>To / Note</th><th>Lent</th><th>Returned</th><th>Status</th></tr></thead><tbody>${lentRows}</tbody></table></div>
+    </div>`:''}
+    ${!borRows&&!lentRows?'<div class="card"><p style="color:var(--text3);font-size:13px;padding:.5rem 0">No debt entries yet. When you lend or borrow money, log it in Add Entry and it will appear here.</p></div>':''}
+  `;
 }
 
 // ── ADMIN ──
@@ -725,6 +819,5 @@ document.getElementById('l-user').addEventListener('keydown',e=>{if(e.key==='Ent
   if(!APIURL){ document.getElementById('no-url-warn').style.display='block'; loadLocal(); }
 })();
 </script>
-
-
-</body></html>
+</body>
+</html>
