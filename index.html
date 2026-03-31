@@ -4,6 +4,27 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Budget Hub</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Budget Hub"/>
+<meta name="theme-color" content="#185FA5"/>
+<link rel="manifest" id="pwa-manifest"/>
+<script>
+// Build SVG icon as data URL — works for favicon, apple-touch-icon, and PWA manifest
+const iconSVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#185FA5"/><text x="256" y="340" font-family="system-ui,sans-serif" font-size="300" font-weight="700" text-anchor="middle" fill="white">₨</text></svg>`;
+const iconURL='data:image/svg+xml;base64,'+btoa(iconSVG);
+
+// Favicon
+const lnk=document.createElement('link');lnk.rel='icon';lnk.type='image/svg+xml';lnk.href=iconURL;document.head.appendChild(lnk);
+
+// Apple touch icon (home screen on iOS)
+const apl=document.createElement('link');apl.rel='apple-touch-icon';apl.href=iconURL;document.head.appendChild(apl);
+
+// PWA manifest (home screen on Android + desktop)
+const manifest={name:'Budget Hub',short_name:'Budget Hub',start_url:'.',display:'standalone',background_color:'#185FA5',theme_color:'#185FA5',icons:[{src:iconURL,sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
+const mBlob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+document.getElementById('pwa-manifest').href=URL.createObjectURL(mBlob);
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{--bg:#f7f7f5;--surface:#fff;--surface2:#f0efec;--border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);--text:#1a1a18;--text2:#6b6b66;--text3:#9a9a94;--blue:#185FA5;--blue-l:#E6F1FB;--blue-d:#0C447C;--green:#1D9E75;--green-l:#EAF3DE;--red:#A32D2D;--red-l:#FCEBEB;--amber:#BA7517;--amber-l:#FAEEDA;--r:10px;--rs:6px}
