@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Budget Hub"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="application-name" content="Budget Hub"/>
 <meta name="theme-color" content="#000000"/>
 <link rel="manifest" id="pwa-manifest"/>
 <script>
@@ -30,9 +32,11 @@ function applyLogoIcons(){
     if(!al){al=document.createElement('link');al.rel='apple-touch-icon';document.head.appendChild(al);}
     al.sizes='512x512';al.href=p512;
     // PWA manifest
-    const m={name:'Budget Hub',short_name:'Budget Hub',description:'Hostel finance tracker',start_url:'.',display:'standalone',background_color:'#000000',theme_color:'#000000',icons:[{src:p192,sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:p512,sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
-    const mb=new Blob([JSON.stringify(m)],{type:'application/json'});
-    document.getElementById('pwa-manifest').href=URL.createObjectURL(mb);
+    const m={name:'Budget Hub',short_name:'Budget Hub',description:'Hostel finance tracker',start_url:'.',display:'standalone',background_color:'#111110',theme_color:'#111110',icons:[{src:p192,sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:p512,sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
+    // Samsung Internet & all browsers: use data: URI — blob URLs are session-scoped and unsupported on Samsung
+    const mStr=JSON.stringify(m);
+    // btoa needs ASCII — use encodeURIComponent + unescape trick for unicode safety
+    document.getElementById('pwa-manifest').href='data:application/json;base64,'+btoa(unescape(encodeURIComponent(mStr)));
   };
   img.src=LOGO_SRC;
 }
@@ -156,7 +160,7 @@ tr:hover td{background:var(--surface2)}
 /* ── SPLASH SCREEN ── */
 #splash{
   position:fixed;inset:0;z-index:9999;
-  background:#000000;
+  background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
   overflow:hidden;
   transition:opacity .6s ease;
@@ -885,6 +889,23 @@ function dlFile(){
 // ── KEYBOARD ──
 document.getElementById('l-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('l-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('l-pin').focus();});
+
+// ── APP VERSION — bump this string every time you upload a new version to GitHub ──
+// This forces old caches to clear so users always get the latest app + icons
+const APP_VERSION = '2026-04-01-v1';
+(function cacheBust(){
+  try {
+    const prev = localStorage.getItem('bh_version');
+    if (prev && prev !== APP_VERSION) {
+      // Version changed — clear all browser caches
+      if ('caches' in window) {
+        caches.keys().then(ks => ks.forEach(k => caches.delete(k)));
+      }
+      console.log('Budget Hub: new version detected, caches cleared');
+    }
+    localStorage.setItem('bh_version', APP_VERSION);
+  } catch(e) {}
+})();
 
 // ── INIT + COIN RAIN SPLASH ──
 (function(){
