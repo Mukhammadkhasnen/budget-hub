@@ -17,26 +17,52 @@ const LOGO_SRC='data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0
 function applyLogoIcons(){
   const img=new Image();
   img.onload=function(){
-    function makePNG(sz){
-      const c=document.createElement('canvas');c.width=sz;c.height=sz;
-      c.getContext('2d').drawImage(img,0,0,sz,sz);
-      return c.toDataURL('image/png');
+
+    // Remove black background from logo pixel-by-pixel
+    // (Claude.ai upload pipeline converts transparent PNG to JPEG with black bg)
+    function removeBg(srcImg, sz){
+      const c=document.createElement('canvas'); c.width=sz; c.height=sz;
+      const ctx=c.getContext('2d');
+      ctx.drawImage(srcImg,0,0,sz,sz);
+      const id=ctx.getImageData(0,0,sz,sz);
+      const d=id.data;
+      for(let i=0;i<d.length;i+=4){
+        const r=d[i], g=d[i+1], b=d[i+2];
+        const brightness=Math.max(r,g,b);
+        if(brightness<50){
+          d[i+3]=0; // fully transparent — pure black bg
+        } else if(brightness<100){
+          // Soft edge anti-aliasing: partial transparency
+          d[i+3]=Math.round(((brightness-50)/50)*255);
+        }
+        // White text and gold coins (brightness>100) stay fully opaque
+      }
+      ctx.putImageData(id,0,0);
+      return c;
     }
-    const p32=makePNG(32),p192=makePNG(192),p512=makePNG(512);
+
+    function makePNG(sz){ return removeBg(img,sz).toDataURL('image/png'); }
+
+    const p32=makePNG(32), p192=makePNG(192), p512=makePNG(512);
+
+    // Update all logo images in the page (splash + login)
+    document.querySelectorAll('img[alt="Budget Hub"]').forEach(el=>{
+      el.src=removeBg(img,400).toDataURL('image/png');
+    });
+
     // Favicon
     let fl=document.querySelector('link[rel="icon"]');
     if(!fl){fl=document.createElement('link');fl.rel='icon';document.head.appendChild(fl);}
     fl.type='image/png';fl.href=p32;
+
     // Apple touch icon
     let al=document.querySelector('link[rel="apple-touch-icon"]');
     if(!al){al=document.createElement('link');al.rel='apple-touch-icon';document.head.appendChild(al);}
     al.sizes='512x512';al.href=p512;
-    // PWA manifest
+
+    // PWA manifest — data: URI for Samsung compatibility
     const m={name:'Budget Hub',short_name:'Budget Hub',description:'Hostel finance tracker',start_url:'.',display:'standalone',background_color:'#111110',theme_color:'#111110',icons:[{src:p192,sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:p512,sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
-    // Samsung Internet & all browsers: use data: URI — blob URLs are session-scoped and unsupported on Samsung
-    const mStr=JSON.stringify(m);
-    // btoa needs ASCII — use encodeURIComponent + unescape trick for unicode safety
-    document.getElementById('pwa-manifest').href='data:application/json;base64,'+btoa(unescape(encodeURIComponent(mStr)));
+    document.getElementById('pwa-manifest').href='data:application/json;base64,'+btoa(unescape(encodeURIComponent(JSON.stringify(m))));
   };
   img.src=LOGO_SRC;
 }
@@ -44,8 +70,13 @@ applyLogoIcons();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg:#f5f4f0;--surface:#ffffff;--surface2:#f0efec;--border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);--text:#1a1a18;--text2:#6b6b66;--text3:#9a9a94;--blue:#c9a227;--blue-l:#fdf6e3;--blue-d:#8a6d10;--green:#1D9E75;--green-l:#EAF3DE;--red:#A32D2D;--red-l:#FCEBEB;--amber:#BA7517;--amber-l:#FAEEDA;--r:10px;--rs:6px}
-@media(prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1c1c1a;--surface2:#242422;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#f0ede8;--text2:#a09d97;--text3:#6b6865;--blue-l:#2a2200;--green-l:#0d2e1e;--red-l:#2e1010;--amber-l:#2e1e05}}
+:root{--bg:#f5f4f0;--surface:#ffffff;--surface2:#f0efec;--border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);--text:#1a1a18;--text2:#6b6b66;--text3:#9a9a94;--blue:#c9a227;--blue-l:#fdf6e3;--blue-d:#8a6d10;--green:#1D9E75;--green-l:#EAF3DE;--red:#A32D2D;--red-l:#FCEBEB;--amber:#BA7517;--amber-l:#FAEEDA;--r:10px;--rs:6px;--transition-theme:background .8s ease,color .8s ease,border-color .8s ease}
+/* Dark theme */
+[data-theme="dark"]{--bg:#111110;--surface:#1c1c1a;--surface2:#242422;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#f0ede8;--text2:#a09d97;--text3:#6b6865;--blue-l:#2a2200;--green-l:#0d2e1e;--red-l:#2e1010;--amber-l:#2e1e05}
+/* Auto theme — interpolated by JS each second based on time */
+[data-theme="auto"]{--bg:var(--auto-bg);--surface:var(--auto-surface);--surface2:var(--auto-surface2);--border:var(--auto-border);--border2:var(--auto-border2);--text:var(--auto-text);--text2:var(--auto-text2);--text3:var(--auto-text3);--blue-l:var(--auto-blue-l);--green-l:var(--auto-green-l);--red-l:var(--auto-red-l);--amber-l:var(--auto-amber-l)}
+/* Smooth transitions when theme changes */
+body,body *{transition:background-color .6s ease,color .4s ease,border-color .4s ease}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100dvh}
 .screen{display:none}.screen.active{display:block}
@@ -318,6 +349,7 @@ tr:hover td{background:var(--surface2)}
       <div class="tr">
         <span id="t-admin" class="tag" style="display:none">Admin</span>
         <div class="sync"><div class="sdot" id="sdot"></div><span id="slbl">Synced</span></div>
+        <button class="btn btn-sm" id="theme-btn" onclick="cycleTheme()" title="Toggle theme" style="font-size:16px;padding:5px 10px;min-width:38px">☀️</button>
         <button class="btn btn-sm" onclick="signOut()">Sign out</button>
       </div>
     </div>
@@ -892,7 +924,145 @@ document.getElementById('l-user').addEventListener('keydown',e=>{if(e.key==='Ent
 
 // ── APP VERSION — bump this string every time you upload a new version to GitHub ──
 // This forces old caches to clear so users always get the latest app + icons
-const APP_VERSION = '2026-04-01-v6';
+// ── THEME ENGINE ──
+// Modes: 'light' | 'dark' | 'auto'
+// Auto mode: interpolates between light and dark based on time of day, updated every second
+
+const THEME_KEY = 'bh_theme';
+const THEME_ICONS = { light:'☀️', dark:'🌙', auto:'🕐' };
+const THEME_LABELS = { light:'Light', dark:'Dark', auto:'Auto (time)' };
+
+// Full colour stops for interpolation
+// Time buckets: 0=midnight(dark), 6=dawn, 9=morning(light), 13=noon(light), 17=afternoon, 20=evening, 22=night, 24=midnight
+const TIME_COLORS = [
+  // hour, bg,       surface,  surface2, text,     text2,    border-alpha, surface-alpha
+  { h:0,  dark:1.0 }, // midnight — full dark
+  { h:5,  dark:1.0 }, // pre-dawn — full dark
+  { h:6,  dark:0.8 }, // dawn — mostly dark
+  { h:8,  dark:0.3 }, // morning — mostly light
+  { h:9,  dark:0.0 }, // full light
+  { h:17, dark:0.0 }, // afternoon — full light
+  { h:19, dark:0.2 }, // early evening
+  { h:20, dark:0.5 }, // evening
+  { h:21, dark:0.75 },// late evening
+  { h:22, dark:0.9 }, // night
+  { h:23, dark:1.0 }, // late night — full dark
+  { h:24, dark:1.0 }, // midnight
+];
+
+// Light palette
+const L = {
+  bg:'245,244,240', surface:'255,255,255', surface2:'240,239,236',
+  text:'26,26,24', text2:'107,107,102', text3:'154,154,148',
+  bl:'253,246,227', gl:'234,243,222', rl:'252,235,235', al:'250,238,218',
+  bora:'0,0,0', borb:'0.10', bor2b:'0.18'
+};
+// Dark palette
+const D = {
+  bg:'17,17,16', surface:'28,28,26', surface2:'36,36,34',
+  text:'240,237,232', text2:'160,157,151', text3:'107,104,101',
+  bl:'42,34,0', gl:'13,46,30', rl:'46,16,16', al:'46,30,5',
+  bora:'255,255,255', borb:'0.08', bor2b:'0.15'
+};
+
+function lerp(a, b, t){ return a + (b - a) * t; }
+function lerpColor(ca, cb, t){
+  const pa = ca.split(',').map(Number);
+  const pb = cb.split(',').map(Number);
+  return pa.map((v,i) => Math.round(lerp(v, pb[i], t))).join(',');
+}
+
+function getDarkness(){
+  // Returns 0 (full light) to 1 (full dark) based on current time
+  const now = new Date();
+  const h = now.getHours() + now.getMinutes()/60;
+  // Find surrounding buckets
+  for(let i=0; i<TIME_COLORS.length-1; i++){
+    const a = TIME_COLORS[i], b = TIME_COLORS[i+1];
+    if(h >= a.h && h < b.h){
+      const t = (h - a.h) / (b.h - a.h);
+      return lerp(a.dark, b.dark, t);
+    }
+  }
+  return 1.0;
+}
+
+function applyAutoTheme(){
+  const t = getDarkness(); // 0=light, 1=dark
+  const root = document.documentElement;
+  // Set all CSS custom properties via inline style on :root
+  root.style.setProperty('--auto-bg',       'rgb('+lerpColor(L.bg, D.bg, t)+')');
+  root.style.setProperty('--auto-surface',  'rgb('+lerpColor(L.surface, D.surface, t)+')');
+  root.style.setProperty('--auto-surface2', 'rgb('+lerpColor(L.surface2, D.surface2, t)+')');
+  root.style.setProperty('--auto-text',     'rgb('+lerpColor(L.text, D.text, t)+')');
+  root.style.setProperty('--auto-text2',    'rgb('+lerpColor(L.text2, D.text2, t)+')');
+  root.style.setProperty('--auto-text3',    'rgb('+lerpColor(L.text3, D.text3, t)+')');
+  root.style.setProperty('--auto-blue-l',   'rgb('+lerpColor(L.bl, D.bl, t)+')');
+  root.style.setProperty('--auto-green-l',  'rgb('+lerpColor(L.gl, D.gl, t)+')');
+  root.style.setProperty('--auto-red-l',    'rgb('+lerpColor(L.rl, D.rl, t)+')');
+  root.style.setProperty('--auto-amber-l',  'rgb('+lerpColor(L.al, D.al, t)+')');
+  const ba = lerpColor(L.bora, D.bora, t);
+  const bb = lerp(parseFloat(L.borb), parseFloat(D.borb), t).toFixed(2);
+  const bb2 = lerp(parseFloat(L.bor2b), parseFloat(D.bor2b), t).toFixed(2);
+  root.style.setProperty('--auto-border',  'rgba('+ba+','+bb+')');
+  root.style.setProperty('--auto-border2', 'rgba('+ba+','+bb2+')');
+  // Update clock icon in button to show current hour
+  const btn = document.getElementById('theme-btn');
+  if(btn && document.documentElement.getAttribute('data-theme')==='auto'){
+    const hr = new Date().getHours();
+    let icon = '🕐';
+    if(hr>=5&&hr<8)  icon='🌅'; // dawn
+    else if(hr>=8&&hr<17)  icon='☀️'; // day
+    else if(hr>=17&&hr<20) icon='🌇'; // evening
+    else if(hr>=20&&hr<22) icon='🌆'; // night
+    else icon='🌙'; // midnight
+    btn.textContent = icon;
+  }
+}
+
+let autoInterval = null;
+function startAutoTheme(){
+  applyAutoTheme();
+  if(autoInterval) clearInterval(autoInterval);
+  autoInterval = setInterval(applyAutoTheme, 1000); // update every second
+}
+function stopAutoTheme(){
+  if(autoInterval){ clearInterval(autoInterval); autoInterval=null; }
+}
+
+function applyTheme(mode){
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-btn');
+  root.setAttribute('data-theme', mode);
+  localStorage.setItem(THEME_KEY, mode);
+  stopAutoTheme();
+  if(mode==='auto'){
+    startAutoTheme();
+  } else {
+    // Clear auto CSS vars
+    root.style.removeProperty('--auto-bg');
+  }
+  if(btn){
+    btn.textContent = THEME_ICONS[mode];
+    btn.title = 'Theme: '+THEME_LABELS[mode]+' (click to change)';
+  }
+}
+
+function cycleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = cur==='light' ? 'dark' : cur==='dark' ? 'auto' : 'light';
+  applyTheme(next);
+}
+
+// Load saved theme on startup
+(function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY);
+  // If no saved preference, check system preference
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+})();
+
+const APP_VERSION = '2026-04-01-v1';
 (function cacheBust(){
   try {
     const prev = localStorage.getItem('bh_version');
