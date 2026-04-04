@@ -733,7 +733,7 @@ function rDash(){
   if(stillOwe>0){
     const borEntries=inc.filter(e=>e.category==='Borrowed money');
     const breakdown=borEntries.map(e=>{
-      const paid=exp.filter(x=>x.category==='Repaid debt'&&notesMatch(e.note,x.note)).reduce((a,x)=>a+x.amount,0);
+      const paid=exp.filter(x=>x.category==='Repaid debt'&&(x.note||'').toLowerCase().includes((e.note||'').toLowerCase())).reduce((a,x)=>a+x.amount,0);
       const left=e.amount-paid;
       return left>0&&e.note?`${e.note} (PKR ${left.toLocaleString()} left)`:left>0?`PKR ${left.toLocaleString()} unpaid`:null;
     }).filter(Boolean);
@@ -744,7 +744,7 @@ function rDash(){
   // Reminder: money others owe you — not yet in balance, will add when you log "Returned loan"
   if(stillOwed>0){
     const pending=lentEntries.map(e=>{
-      const got=retEntries.filter(r=>notesMatch(e.note,r.note)).reduce((a,r)=>a+r.amount,0);
+      const got=retEntries.filter(r=>(r.note||'').toLowerCase().includes((e.note||'').toLowerCase())).reduce((a,r)=>a+r.amount,0);
       const left=e.amount-got;
       return left>0&&e.note?`${e.note} owes PKR ${left.toLocaleString()}`:left>0?`PKR ${left.toLocaleString()} pending`:null;
     }).filter(Boolean);
@@ -812,23 +812,10 @@ function rDebts(){
   const stillOwed=Math.max(0,lnt-ret);
 
   // Build per-person breakdown for money you lent
-  // Matching: notes must match exactly (case-insensitive) OR share a word — never match if note is empty
   const lentEntries=ents.filter(e=>e.category==='Lent money');
   const retEntries=ents.filter(e=>e.category==='Returned loan');
-
-  function notesMatch(lendNote, retNote){
-    const a=(lendNote||'').trim().toLowerCase();
-    const b=(retNote||'').trim().toLowerCase();
-    if(!a||!b) return false; // never match empty notes
-    if(a===b) return true;
-    // match if lend note appears anywhere in return note or vice versa
-    if(b.includes(a)||a.includes(b)) return true;
-    // match if any word from lend note appears in return note
-    return a.split(/\s+/).some(w=>w.length>2&&b.includes(w));
-  }
-
   const lentRows=lentEntries.map(e=>{
-    const got=retEntries.filter(r=>notesMatch(e.note,r.note)).reduce((a,r)=>a+r.amount,0);
+    const got=retEntries.filter(r=>(r.note||'').toLowerCase().includes((e.note||'').toLowerCase())).reduce((a,r)=>a+r.amount,0);
     const left=e.amount-got;
     const status=left<=0
       ? `<span class="badge bi">Returned ✓</span>`
@@ -840,7 +827,7 @@ function rDebts(){
   const borEntries=ents.filter(e=>e.category==='Borrowed money');
   const repEntries=ents.filter(e=>e.category==='Repaid debt');
   const borRows=borEntries.map(e=>{
-    const paid=repEntries.filter(r=>notesMatch(e.note,r.note)).reduce((a,r)=>a+r.amount,0);
+    const paid=repEntries.filter(r=>(r.note||'').toLowerCase().includes((e.note||'').toLowerCase())).reduce((a,r)=>a+r.amount,0);
     const left=e.amount-paid;
     const status=left<=0
       ? `<span class="badge bi">Repaid ✓</span>`
